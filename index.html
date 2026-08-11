@@ -257,8 +257,10 @@ function buildPopupFeatures(box){
 }
 function buildIntentUrl(caption,url){
   const params=new URLSearchParams();
-  params.set('text',caption);
-  if(url)params.set('url',url);
+  // Put the unique OG share URL FIRST in the composer text.
+  // X's web composer can surface the first URL as the link card; using
+  // the intent `url` parameter caused X to append it after the caption.
+  params.set('text',url?`${url}\n\n${caption}`:caption);
   return `${X_INTENT}?${params.toString()}`;
 }
 function prefersNativeShare(){
