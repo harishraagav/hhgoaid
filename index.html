@@ -257,16 +257,9 @@ function buildPopupFeatures(box){
 }
 function buildIntentUrl(caption,url){
   const params=new URLSearchParams();
-  params.set('text',url?`${caption}\n\n${url}`:caption);
+  params.set('text',caption);
+  if(url)params.set('url',url);
   return `${X_INTENT}?${params.toString()}`;
-}
-function buildOgShareUrl(imageUrl,kind){
-  const base=`${location.origin}/api/share`;
-  // X needs a genuinely new card URL for each generated image. The server
-  // ignores this value, but X sees it as a fresh URL and crawls the OG tags.
-  const unique=`${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
-  const params=new URLSearchParams({image:imageUrl,kind,v:unique});
-  return `${base}?${params.toString()}`;
 }
 function prefersNativeShare(){
   if(typeof navigator==='undefined'||typeof window==='undefined')return false;
@@ -325,9 +318,9 @@ frameShareBtn.addEventListener('click',()=>{
           if(error instanceof Error&&error.name==='AbortError'){if(shareShell)shareShell.close();frameShareBtn.disabled=false;frameShareBtn.textContent='Share to X 𝕏';frameShareNote.textContent='Share cancelled.';return;}
         }
       }
-      const {pageUrl,imageUrl}=await uploadToImgbb(blob);
-      const shareUrl=buildOgShareUrl(imageUrl,'builder');
-      if(!shareUrl)throw new Error('No share URL returned');
+      const {imageUrl}=await uploadToImgbb(blob);
+      if(!imageUrl)throw new Error('No image URL returned');
+      const shareUrl=`https://hhgoaid.vercel.app/api/share?image=${encodeURIComponent(imageUrl)}&kind=frame&v=${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
       const intent=buildIntentUrl(caption,shareUrl);
       frameShareNote.textContent='Opening X with your generated frame preview…';
       if(shareShell&&!shareShell.close){};
@@ -364,9 +357,9 @@ shareBtn.addEventListener('click',()=>{
           if(error instanceof Error&&error.name==='AbortError'){if(shareShell)shareShell.close();shareBtn.disabled=false;shareBtn.textContent='Share to X 𝕏';shareNote.textContent='Share cancelled.';return;}
         }
       }
-      const {pageUrl,imageUrl}=await uploadToImgbb(blob);
-      const shareUrl=buildOgShareUrl(imageUrl,'frame');
-      if(!shareUrl)throw new Error('No share URL returned');
+      const {imageUrl}=await uploadToImgbb(blob);
+      if(!imageUrl)throw new Error('No image URL returned');
+      const shareUrl=`https://hhgoaid.vercel.app/api/share?image=${encodeURIComponent(imageUrl)}&kind=builder&v=${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
       const intent=buildIntentUrl(caption,shareUrl);
       shareNote.textContent='Opening X with your generated Builder ID preview…';
       if(shareShell)shareShell.navigate(intent);else if(!openPopup(intent))window.location.href=intent;
