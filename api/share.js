@@ -54,7 +54,7 @@ function handler(req, res) {
 </html>`
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8')
-  res.setHeader('Cache-Control', 'public, s-maxage=31536000, stale-while-revalidate=86400')
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   res.status(200).send(html)
 }
 
