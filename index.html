@@ -262,7 +262,10 @@ function buildIntentUrl(caption,url){
 }
 function buildOgShareUrl(imageUrl,kind){
   const base=`${location.origin}/api/share`;
-  const params=new URLSearchParams({image:imageUrl,kind});
+  // X needs a genuinely new card URL for each generated image. The server
+  // ignores this value, but X sees it as a fresh URL and crawls the OG tags.
+  const unique=`${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
+  const params=new URLSearchParams({image:imageUrl,kind,v:unique});
   return `${base}?${params.toString()}`;
 }
 function prefersNativeShare(){
