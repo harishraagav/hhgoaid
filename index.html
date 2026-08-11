@@ -257,10 +257,15 @@ function buildPopupFeatures(box){
 }
 function buildIntentUrl(caption,url){
   const params=new URLSearchParams();
-  // Put the unique OG share URL FIRST in the composer text.
-  // X's web composer can surface the first URL as the link card; using
-  // the intent `url` parameter caused X to append it after the caption.
-  params.set('text',url?`${url}\n\n${caption}`:caption);
+  // Keep the generated OG share URL as the FIRST clickable URL.
+  // The promotional link remains clickable, but comes after the OG URL
+  // so X selects the generated share page for its card.
+  const promo='Get your own builder id: https://hhgoaid.vercel.app';
+  const cleanCaption=caption.replace(`\n\n${promo}`,'').replace(promo,'').trim();
+  const text=url
+    ? `${cleanCaption}\n\n${url}\nGet your own builder id: https://hhgoaid.vercel.app`
+    : caption;
+  params.set('text',text);
   return `${X_INTENT}?${params.toString()}`;
 }
 function prefersNativeShare(){
